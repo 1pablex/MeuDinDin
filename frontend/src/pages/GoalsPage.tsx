@@ -5,6 +5,8 @@ import type { Goal, GoalDetail, GoalInput } from '../api/types'
 import { useCurrentUser } from '../auth/useAuth'
 import { EditIcon, PlusIcon, TrashIcon, XIcon } from '../components/Icons'
 import { InvitesBanner } from '../components/InvitesBanner'
+import { MoneyInput } from '../components/MoneyInput'
+import { normalizeDecimal } from '../lib/money'
 import { Card, Empty, ErrorText, Loading, ProgressBar } from '../components/ui'
 import { dateBR, initials, money, toNumber } from '../lib/format'
 
@@ -195,8 +197,8 @@ function GoalDetailCard({ goal, onEdit, onGone }: { goal: GoalDetail; onEdit: ()
 
       <form className="inline-form" onSubmit={contribute(1)}>
         <label className="field grow">
-          Valor (R$)
-          <input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0,00" />
+          Valor
+          <MoneyInput value={amount} onChange={setAmount} />
         </label>
         <label className="field grow">
           Observação (opcional)
@@ -368,7 +370,7 @@ function GoalForm({ goal, onClose, onCreated }: {
   const save = useSaveGoal()
   const [form, setForm] = useState<GoalInput>({
     name: goal?.name ?? '',
-    target_amount: goal ? String(goal.target_amount) : '',
+    target_amount: goal ? normalizeDecimal(goal.target_amount) : '',
     deadline: goal?.deadline ?? null,
   })
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -408,13 +410,8 @@ function GoalForm({ goal, onClose, onCreated }: {
           {errors.name && <span className="field-error">{errors.name}</span>}
         </label>
         <label className="field">
-          Valor da meta (R$)
-          <input
-            inputMode="decimal"
-            value={form.target_amount}
-            onChange={(e) => setForm((f) => ({ ...f, target_amount: e.target.value }))}
-            placeholder="0,00"
-          />
+          Valor da meta
+          <MoneyInput value={form.target_amount} onChange={(v) => setForm((f) => ({ ...f, target_amount: v }))} />
           {errors.target_amount && <span className="field-error">{errors.target_amount}</span>}
         </label>
         <label className="field">

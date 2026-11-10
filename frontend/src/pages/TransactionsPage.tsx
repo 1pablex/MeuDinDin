@@ -9,6 +9,8 @@ import {
 } from '../api/hooks'
 import type { Kind, Recurrence, Transaction, TransactionInput } from '../api/types'
 import { EditIcon, TrashIcon } from '../components/Icons'
+import { MoneyInput } from '../components/MoneyInput'
+import { normalizeDecimal } from '../lib/money'
 import { Card, Empty, ErrorText, Loading, Segmented } from '../components/ui'
 import { dateBR, money, recurrenceLabel, todayISO } from '../lib/format'
 
@@ -231,7 +233,7 @@ function TransactionForm({ editing, onDone }: { editing: Transaction | null; onD
       ? {
           kind: editing.kind,
           description: editing.description,
-          amount: String(editing.amount),
+          amount: normalizeDecimal(editing.amount),
           category: editing.category,
           date: editing.date,
           recurrence: editing.recurrence,
@@ -334,13 +336,8 @@ function TransactionForm({ editing, onDone }: { editing: Transaction | null; onD
 
         <div className="grid-2">
           <label className="field">
-            Valor (R$)
-            <input
-              inputMode="decimal"
-              value={form.amount}
-              onChange={(e) => set('amount', e.target.value)}
-              placeholder="0,00"
-            />
+            Valor
+            <MoneyInput value={form.amount} onChange={(v) => set('amount', v)} />
             {errors.amount && <span className="field-error">{errors.amount}</span>}
           </label>
           <label className="field">
